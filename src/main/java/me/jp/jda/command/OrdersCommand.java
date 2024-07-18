@@ -46,7 +46,7 @@ public class OrdersCommand extends ListenerAdapter {
                     .setRequired(true)
                     .build();
             TextInput descriptionMenu = TextInput.create("encomendas-description", "Descrição", TextInputStyle.PARAGRAPH)
-                    .setPlaceholder("Digite o titulo do menu de encomendas")
+                    .setPlaceholder("Digite a descrição do menu de encomendas")
                     .setMaxLength(4000)
                     .setRequired(true)
                     .build();
@@ -98,10 +98,12 @@ public class OrdersCommand extends ListenerAdapter {
                                     if (buttonEvent.getButton().getId().equalsIgnoreCase("encomendas-cancelar-button")) {
                                         originalMessage.delete().queue();
                                         buttonEvent.reply("Você cancelou a criação do menu de encomendas!").setEphemeral(true).queue();
+                                        e.getJDA().removeEventListener(this);
                                     }
                                     if (buttonEvent.getButton().getId().equalsIgnoreCase("encomendas-criar-button")) {
                                         originalMessage.delete().queue();
                                         buttonEvent.getChannel().asTextChannel().sendMessageEmbeds(embedBuilder.build()).addActionRow(selectMenu).queue();
+                                        e.getJDA().removeEventListener(this);
                                     }
                                 }
                             });
@@ -193,9 +195,8 @@ public class OrdersCommand extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
         if (event.getComponentId().equalsIgnoreCase("fechar-ticket")) {
-            String user = event.getUser().getName();
             event.getChannel().getHistory().retrievePast(100).queue(messages -> {
-                String fileName = "ticket-" + user + ".log";
+                String fileName = "ticket-" + event.getChannel().getName() + ".log";
                 try {
                     File logFile = new File(fileName);
                     logFile.createNewFile();
