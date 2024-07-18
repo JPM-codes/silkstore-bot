@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import java.util.EnumSet;
 
 public class Main {
-    private static final String token = "YOUR TOKEN";
 
     public static PluginCache pluginCache;
 
@@ -23,8 +22,7 @@ public class Main {
 
         pluginCache = new PluginCache();
 
-
-        JDA jda = JDABuilder.createDefault(token, EnumSet.of(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT))
+        JDA jda = JDABuilder.createDefault("YOUR TOKEN", EnumSet.of(GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT))
                 .addEventListeners(
                         new PluginCommand(),
                         new PluginsCommand(),
