@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import java.util.EnumSet;
 
 public class Main {
-    private static final String token = "MTI2MjIzNzA5Njk3MDU1MTMzOA.G3EUZG.JQ3CaXUuC2HVMn7tpecok-weyHZEkGoSM1vIO4";
+    private static final String token = "YOUR TOKEN";
 
     public static PluginCache pluginCache;
 
