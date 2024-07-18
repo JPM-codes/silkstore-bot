@@ -1,5 +1,8 @@
 package me.jp.jda.command;
 
+import lombok.RequiredArgsConstructor;
+import me.jp.jda.data.system.System;
+import me.jp.jda.data.system.SystemCache;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -29,7 +32,10 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+@RequiredArgsConstructor
 public class OrdersCommand extends ListenerAdapter {
+
+    private final SystemCache systemCache;
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent e) {
@@ -119,75 +125,79 @@ public class OrdersCommand extends ListenerAdapter {
             String selected = e.getValues().get(0);
             if (selected.equalsIgnoreCase("plugins")) {
                 // Procurar a categoria "Tickets"
-                Category ticketsCategory = e.getGuild().getCategoriesByName("Tickets", true).stream().findFirst().orElse(null);
+                for (System system : systemCache.getCachedElements()) {
+                    Category ticketsCategory = e.getGuild().getCategoriesByName(system.getTicketCategory(), true).stream().findFirst().orElse(null);;
 
-                if (ticketsCategory == null) {
-                    e.reply("A categoria 'Tickets' não foi encontrada.").setEphemeral(true).queue();
-                    return;
+                    if (ticketsCategory == null) {
+                        e.reply("A categoria 'Tickets' não foi encontrada.").setEphemeral(true).queue();
+                        return;
+                    }
+
+                    String channelName = e.getUser().getId() + "-plugin";
+                    Guild guild = e.getGuild();
+                    Member member = e.getMember();
+                    ticketsCategory.createTextChannel(channelName).addPermissionOverride(guild.getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
+                            .addPermissionOverride(member, Permission.VIEW_CHANNEL.getRawValue(), 0)
+                            .addPermissionOverride(guild.getRolesByName("TICKET", true).get(0), Permission.VIEW_CHANNEL.getRawValue(), 0)
+                            .queue(channel -> {
+                                channel.sendMessage("Olá " + member.getAsMention() + ", o seu ticket será atendido por nossa equipe em breve!")
+                                        .addActionRow(
+                                                Button.danger("fechar-ticket", "Fechar Ticket"),
+                                                Button.secondary("trancar-ticket", "Trancar")
+                                        ).queue();
+                                e.reply("Canal " + channel.getAsMention() + " criado com sucesso!").setEphemeral(true).queue();
+                            });
                 }
-
-                String channelName = e.getUser().getId() + "-plugin";
-                Guild guild = e.getGuild();
-                Member member = e.getMember();
-                ticketsCategory.createTextChannel(channelName).addPermissionOverride(guild.getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                        .addPermissionOverride(member, Permission.VIEW_CHANNEL.getRawValue(), 0)
-                        .addPermissionOverride(guild.getRolesByName("TICKET", true).get(0), Permission.VIEW_CHANNEL.getRawValue(), 0)
-                        .queue(channel -> {
-                            channel.sendMessage("Olá " + member.getAsMention() + ", o seu ticket será atendido por nossa equipe em breve!")
-                                    .addActionRow(
-                                            Button.danger("fechar-ticket", "Fechar Ticket"),
-                                            Button.secondary("trancar-ticket", "Trancar")
-                                    ).queue();
-                            e.reply("Canal " + channel.getAsMention() + " criado com sucesso!").setEphemeral(true).queue();
-                        });
             }
             if (selected.equalsIgnoreCase("configuracao")) {
-                // Procurar a categoria "Tickets"
-                Category ticketsCategory = e.getGuild().getCategoriesByName("Tickets", true).stream().findFirst().orElse(null);
+                for (System system : systemCache.getCachedElements()) {
+                    Category ticketsCategory = e.getGuild().getCategoriesByName(system.getTicketCategory(), true).stream().findFirst().orElse(null);;
 
-                if (ticketsCategory == null) {
-                    e.reply("A categoria 'Tickets' não foi encontrada.").setEphemeral(true).queue();
-                    return;
+                    if (ticketsCategory == null) {
+                        e.reply("A categoria 'Tickets' não foi encontrada.").setEphemeral(true).queue();
+                        return;
+                    }
+
+                    String channelName = e.getUser().getId() + "-configuracao";
+                    Guild guild = e.getGuild();
+                    Member member = e.getMember();
+                    ticketsCategory.createTextChannel(channelName).addPermissionOverride(guild.getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
+                            .addPermissionOverride(member, Permission.VIEW_CHANNEL.getRawValue(), 0)
+                            .addPermissionOverride(guild.getRolesByName("TICKET", true).get(0), Permission.VIEW_CHANNEL.getRawValue(), 0)
+                            .queue(channel -> {
+                                channel.sendMessage("Olá " + member.getAsMention() + ", o seu ticket será atendido por nossa equipe em breve!")
+                                        .addActionRow(
+                                                Button.danger("fechar-ticket", "Fechar Ticket"),
+                                                Button.secondary("trancar-ticket", "Trancar")
+                                        ).queue();
+                                e.reply("Canal " + channel.getAsMention() + " criado com sucesso!").setEphemeral(true).queue();
+                            });
                 }
-
-                String channelName = e.getUser().getId() + "-configuracao";
-                Guild guild = e.getGuild();
-                Member member = e.getMember();
-                ticketsCategory.createTextChannel(channelName).addPermissionOverride(guild.getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                        .addPermissionOverride(member, Permission.VIEW_CHANNEL.getRawValue(), 0)
-                        .addPermissionOverride(guild.getRolesByName("TICKET", true).get(0), Permission.VIEW_CHANNEL.getRawValue(), 0)
-                        .queue(channel -> {
-                            channel.sendMessage("Olá " + member.getAsMention() + ", o seu ticket será atendido por nossa equipe em breve!")
-                                    .addActionRow(
-                                            Button.danger("fechar-ticket", "Fechar Ticket"),
-                                            Button.secondary("trancar-ticket", "Trancar")
-                                    ).queue();
-                            e.reply("Canal " + channel.getAsMention() + " criado com sucesso!").setEphemeral(true).queue();
-                        });
             }
             if (selected.equalsIgnoreCase("servidor")) {
-                // Procurar a categoria "Tickets"
-                Category ticketsCategory = e.getGuild().getCategoriesByName("Tickets", true).stream().findFirst().orElse(null);
+                for (System system : systemCache.getCachedElements()) {
+                    Category ticketsCategory = e.getGuild().getCategoriesByName(system.getTicketCategory(), true).stream().findFirst().orElse(null);;
 
-                if (ticketsCategory == null) {
-                    e.reply("A categoria 'Tickets' não foi encontrada.").setEphemeral(true).queue();
-                    return;
+                    if (ticketsCategory == null) {
+                        e.reply("A categoria 'Tickets' não foi encontrada.").setEphemeral(true).queue();
+                        return;
+                    }
+
+                    String channelName = e.getUser().getId() + "-servidor";
+                    Guild guild = e.getGuild();
+                    Member member = e.getMember();
+                    ticketsCategory.createTextChannel(channelName).addPermissionOverride(guild.getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
+                            .addPermissionOverride(member, Permission.VIEW_CHANNEL.getRawValue(), 0)
+                            .addPermissionOverride(guild.getRolesByName("TICKET", true).get(0), Permission.VIEW_CHANNEL.getRawValue(), 0)
+                            .queue(channel -> {
+                                channel.sendMessage("Olá " + member.getAsMention() + ", o seu ticket será atendido por nossa equipe em breve!")
+                                        .addActionRow(
+                                                Button.danger("fechar-ticket", "Fechar Ticket"),
+                                                Button.secondary("trancar-ticket", "Trancar")
+                                        ).queue();
+                                e.reply("Canal " + channel.getAsMention() + " criado com sucesso!").setEphemeral(true).queue();
+                            });
                 }
-
-                String channelName = e.getUser().getId() + "-servidor";
-                Guild guild = e.getGuild();
-                Member member = e.getMember();
-                ticketsCategory.createTextChannel(channelName).addPermissionOverride(guild.getPublicRole(), 0, Permission.VIEW_CHANNEL.getRawValue())
-                        .addPermissionOverride(member, Permission.VIEW_CHANNEL.getRawValue(), 0)
-                        .addPermissionOverride(guild.getRolesByName("TICKET", true).get(0), Permission.VIEW_CHANNEL.getRawValue(), 0)
-                        .queue(channel -> {
-                            channel.sendMessage("Olá " + member.getAsMention() + ", o seu ticket será atendido por nossa equipe em breve!")
-                                    .addActionRow(
-                                            Button.danger("fechar-ticket", "Fechar Ticket"),
-                                            Button.secondary("trancar-ticket", "Trancar")
-                                    ).queue();
-                            e.reply("Canal " + channel.getAsMention() + " criado com sucesso!").setEphemeral(true).queue();
-                        });
             }
         }
     }
@@ -195,43 +205,45 @@ public class OrdersCommand extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
         if (event.getComponentId().equalsIgnoreCase("fechar-ticket")) {
-            event.getChannel().getHistory().retrievePast(100).queue(messages -> {
-                String fileName = "ticket-" + event.getChannel().getName() + ".log";
-                try {
-                    File logFile = new File(fileName);
-                    logFile.createNewFile();
-                    FileWriter fw = new FileWriter(logFile);
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    for (net.dv8tion.jda.api.entities.Message message : messages) {
-                        String logMessage = "[" + message.getTimeCreated().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "] "
-                                + message.getAuthor().getAsTag() + ": " + message.getContentDisplay() + "\n";
-                        bw.write(logMessage);
-                    }
-                    bw.close();
-                    fw.close();
-                    TextChannel logsChannel = event.getGuild().getTextChannelById("1262246767282360321");
-                    if (logsChannel != null) {
-                        logsChannel.sendFiles(FileUpload.fromData(logFile)).queue(
-                                success -> {
-                                    // Remover o canal do ticket
-                                    event.getChannel().delete().queue(
-                                            v -> event.reply("Ticket fechado com sucesso! Log enviado para " + logsChannel.getAsMention()).queue(),
-                                            f -> event.reply("Erro ao fechar o ticket.").queue()
-                                    );
-                                },
-                                failure -> {
-                                    event.reply("Erro ao enviar o log do ticket.").queue();
-                                }
-                        );
-                    } else {
-                        event.reply("Canal de logs não encontrado.").queue();
-                    }
+            for (System system : systemCache.getCachedElements()) {
+                TextChannel logsChannel = event.getGuild().getTextChannelById(system.getLogChannel());
+                event.getChannel().getHistory().retrievePast(100).queue(messages -> {
+                    String fileName = "ticket-" + event.getChannel().getName() + ".log";
+                    try {
+                        File logFile = new File(fileName);
+                        logFile.createNewFile();
+                        FileWriter fw = new FileWriter(logFile);
+                        BufferedWriter bw = new BufferedWriter(fw);
+                        for (net.dv8tion.jda.api.entities.Message message : messages) {
+                            String logMessage = "[" + message.getTimeCreated().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")) + "] "
+                                    + message.getAuthor().getAsTag() + ": " + message.getContentDisplay() + "\n";
+                            bw.write(logMessage);
+                        }
+                        bw.close();
+                        fw.close();
+                        if (logsChannel != null) {
+                            logsChannel.sendFiles(FileUpload.fromData(logFile)).queue(
+                                    success -> {
+                                        // Remover o canal do ticket
+                                        event.getChannel().delete().queue(
+                                                v -> event.reply("Ticket fechado com sucesso! Log enviado para " + logsChannel.getAsMention()).queue(),
+                                                f -> event.reply("Erro ao fechar o ticket.").queue()
+                                        );
+                                    },
+                                    failure -> {
+                                        event.reply("Erro ao enviar o log do ticket.").queue();
+                                    }
+                            );
+                        } else {
+                            event.reply("Canal de logs não encontrado.").queue();
+                        }
 
-                } catch (IOException ex) {
-                    event.reply("Erro ao salvar o log do ticket.").queue();
-                    ex.printStackTrace();
-                }
-            });
+                    } catch (IOException ex) {
+                        event.reply("Erro ao salvar o log do ticket.").queue();
+                        ex.printStackTrace();
+                    }
+                });
+            }
         }
     }
 }
